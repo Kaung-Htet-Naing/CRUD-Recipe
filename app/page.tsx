@@ -1,113 +1,244 @@
-import Image from 'next/image'
+"use client";
+import { Add, Delete, Edit } from "@mui/icons-material";
+import { Autocomplete, Chip, Stack, TextField } from "@mui/material";
+import Button from "@mui/material/Button";
+import { useEffect, useState } from "react";
+import Card from "@mui/material/Card";
+import {
+	CreateOrEditComponent,
+	DetailComponent,
+	RecipeCard,
+} from "@/components";
+
+const recipeMenus = [
+	{
+		id: 1,
+		label: "Chicken Curry",
+		category: "lunch",
+		ingredients: ["salt", "sugar", "papper", "chicken"],
+		description: "I love this chicken curry so much",
+	},
+	{
+		id: 2,
+		label: "Rubber Band",
+		category: "breakfast",
+		ingredients: [
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+			"salt",
+			"sugar",
+			"papper",
+			"chicken",
+		],
+		description: "I love this chicken curry so much",
+	},
+	{
+		id: 3,
+		label: "Pizza",
+		category: "dinner",
+		ingredients: ["salt", "sugar", "papper", "chicken"],
+		description: "I love this chicken curry so much",
+	},
+	{
+		id: 4,
+		label: "chuper Curry",
+		category: "lunch",
+		ingredients: ["salt", "sugar", "papper", "chicken"],
+		description: "I love this chicken curry so much",
+	},
+];
+
+export type recipeType = {
+	id: number;
+	label: string;
+	category: string;
+	ingredients: string[];
+	description: string;
+};
+
+type recipesType = recipeType[];
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+	const [recipes, setRecipes] = useState<recipesType>(recipeMenus);
+	const [filterRecipes, setFilterRecipes] = useState<recipesType>([]);
+	const [selectedRecipe, setSelectedRecipe] = useState<recipeType>(recipes[0]);
+	const [editRecipe, setEditRecipe] = useState<recipeType | null>(null);
+	const [isCreate, setIsCreate] = useState<boolean>(false);
+	const [isDetail, setDetail] = useState(true);
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+	const onFilterRecipe = (value: string) => {
+		console.log(value.length);
+		if (value.length === 0) {
+			setFilterRecipes(recipes);
+			return;
+		}
+		/* const filter = recipes.filter((recipe) =>
+			recipe.label
+				.toLowerCase()
+				.replace(/\s/g, "")
+				.includes(value.toLowerCase().replace(/\s/g, ""))
+		);
+		setFilterRecipes(filter); */
+	};
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+	const onSelectCard = (id: number) => {
+		const filter = recipes.filter((recipe) => recipe.id === id);
+		setSelectedRecipe(filter[0]);
+		setDetail(true);
+	};
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+	const onDeleteRecipe = (id: number) => {
+		const updatedRecipes = recipes.filter((recipe) => recipe.id !== id);
+		setRecipes(updatedRecipes);
+		setSelectedRecipe(updatedRecipes[0]);
+	};
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
+	const onEditRecipe = (id: number) => {
+		const filterEditRecipe = recipes.filter((recipe) => recipe.id === id);
+		setEditRecipe(filterEditRecipe[0]);
+		setDetail(false);
+		setIsCreate(false);
+	};
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+	const onUpdateRecipe = (id: number, updatedRecipe: recipeType) => {
+		setRecipes((prevRecipes) =>
+			prevRecipes.map((recipe) =>
+				recipe.id === id ? { ...updatedRecipe } : recipe
+			)
+		);
+	};
+
+	const onCreateRecipe = (newRecipe: Omit<recipeType, "id">) => {
+		const maxId = recipes.reduce(
+			(max, recipe) => (recipe.id > max ? recipe.id : max),
+			0
+		);
+		const recipeWithNewId = {
+			...newRecipe,
+			id: maxId + 1,
+		};
+		setRecipes((prevRecipes) => [...prevRecipes, recipeWithNewId]);
+	};
+
+	return (
+		<div className="flex flex-row h-screen">
+			<div className="flex w-[30%] flex-col pt-10 px-2">
+				<Button
+					variant="contained"
+					color="primary"
+					endIcon={<Add />}
+					className="self-end min-w-min"
+					onClickCapture={() => {
+						setDetail(false);
+						setIsCreate(true);
+					}}
+				>
+					Add New recipe
+				</Button>
+				<Autocomplete
+					selectOnFocus
+					clearOnBlur
+					options={recipeMenus}
+					disablePortal
+					getOptionLabel={(option) => option.label}
+					renderOption={(props, option) => (
+						<li
+							{...props}
+							onClickCapture={() => {
+								setFilterRecipes(option);
+							}}
+						>
+							{option.label}
+						</li>
+					)}
+					renderInput={(params) => <TextField {...params} label="Search" />}
+					onKeyDown={(event) => {
+						if (event.key === "Enter") {
+							event.defaultMuiPrevented = true;
+							console.log(event.target.value);
+							setFilterRecipes(
+								recipes.filter((recipe) =>
+									recipe.label
+										.toLowerCase()
+										.replace(/\s/g, "")
+										.includes(
+											event.target.value.toLowerCase().replace(/\s/g, "")
+										)
+								)
+							);
+						}
+					}}
+					className="my-4"
+					onInputChange={(event) => onFilterRecipe(event.target.value)}
+				/>
+				<div className="flex flex-col overflow-y-scroll">
+					{filterRecipes?.length > 0
+						? filterRecipes.map(({ label, ingredients, id }, index) => (
+								<RecipeCard
+									key={index}
+									label={label}
+									ingredients={ingredients}
+									onSelectCard={onSelectCard}
+									onDeleteRecipe={onDeleteRecipe}
+									onEditRecipe={onEditRecipe}
+									id={id}
+								/>
+						  ))
+						: recipes.map(({ label, ingredients, id }, index) => (
+								<RecipeCard
+									key={index}
+									label={label}
+									ingredients={ingredients}
+									onSelectCard={onSelectCard}
+									onDeleteRecipe={onDeleteRecipe}
+									onEditRecipe={onEditRecipe}
+									id={id}
+								/>
+						  ))}
+				</div>
+			</div>
+			<div className="flex flex-1 pt-4 bg-[#DADEE2]">
+				{selectedRecipe && isDetail && (
+					<DetailComponent
+						recipe={selectedRecipe}
+						onEditRecipe={onEditRecipe}
+						onDeleteRecipe={onDeleteRecipe}
+					/>
+				)}
+
+				{isDetail === false && isCreate && (
+					<CreateOrEditComponent
+						onCreateRecipe={onCreateRecipe}
+						isCreate={isCreate}
+					/>
+				)}
+
+				{isDetail === false && !isCreate && (
+					<CreateOrEditComponent
+						editRecipe={editRecipe}
+						isCreate={isCreate}
+						onUpdateRecipe={onUpdateRecipe}
+					/>
+				)}
+			</div>
+		</div>
+	);
 }
