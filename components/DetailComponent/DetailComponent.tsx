@@ -9,7 +9,7 @@ const DetailComponent: React.FC<{
 	onEditRecipe: (id: number) => void;
 	onDeleteRecipe: (id: number) => void;
 }> = ({ recipe, onEditRecipe, onDeleteRecipe }) => {
-	const { label, ingredients, description, category, id } = recipe;
+	const { title, ingredients, description, category, id } = recipe;
 
 	return (
 		<div className="w-[70%] mx-auto">
@@ -32,7 +32,7 @@ const DetailComponent: React.FC<{
 				gutterBottom
 				className="text-center"
 			>
-				{label}
+				{title}
 			</Typography>
 			<Typography
 				color="text.primary"

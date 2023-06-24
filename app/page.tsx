@@ -25,9 +25,12 @@ export default function Home() {
 	const [recipes, setRecipes] = useState<recipesType>([]);
 	const [filterRecipes, setFilterRecipes] = useState<recipesType>([]);
 	const [selectedRecipe, setSelectedRecipe] = useState<recipeType | null>(null);
-	const [editRecipe, setEditRecipe] = useState<recipeType | null>(null);
+	const [editRecipe, setEditRecipe] = useState<recipeType | undefined | null>(
+		null
+	);
 	const [isCreate, setIsCreate] = useState<boolean>(false);
 	const [isDetail, setDetail] = useState(true);
+	const [inputValue, setInputValue] = useState<string>("");
 
 	const getRecipes = () => {
 		fetch(`${API_URL}/recipes`, { method: "GET" })
@@ -43,9 +46,8 @@ export default function Home() {
 		getRecipes();
 	}, []);
 
-	const onFilterRecipe = (value: string) => {
-		console.log(value.length);
-		if (value.length === 0) {
+	const onFilterRecipe = () => {
+		if (inputValue.length === 0) {
 			setFilterRecipes(recipes);
 			return;
 		}
@@ -127,23 +129,25 @@ export default function Home() {
 					selectOnFocus
 					clearOnBlur
 					options={recipes}
+					disableClearable
 					disablePortal
 					getOptionLabel={(option) => option.title}
-					renderOption={(props, option) => (
-						<li
-							{...props}
-							onClickCapture={() => {
-								setFilterRecipes(option);
-							}}
-						>
-							{option.title}
-						</li>
-					)}
+					renderOption={(props, option) => {
+						return (
+							<li
+								{...props}
+								/* onClickCapture={() => {
+									setFilterRecipes([option]);
+								}} */
+							>
+								{option.title}
+							</li>
+						);
+					}}
 					renderInput={(params) => <TextField {...params} label="Search" />}
-					onKeyDown={(event) => {
+					onKeyDown={(event: any) => {
 						if (event.key === "Enter") {
 							event.defaultMuiPrevented = true;
-							console.log(event.target.value);
 							setFilterRecipes(
 								recipes.filter((recipe) =>
 									recipe.title
@@ -157,7 +161,7 @@ export default function Home() {
 						}
 					}}
 					className="my-4"
-					onInputChange={(event) => onFilterRecipe(event.target.value)}
+					onInputChange={onFilterRecipe}
 				/>
 				<div className="flex flex-col overflow-y-scroll">
 					{filterRecipes?.length > 0
@@ -198,11 +202,13 @@ export default function Home() {
 					<CreateOrEditComponent
 						onCreateRecipe={onCreateRecipe}
 						isCreate={isCreate}
+						onUpdateRecipe={() => {}}
 					/>
 				)}
 
 				{isDetail === false && !isCreate && (
 					<CreateOrEditComponent
+						onCreateRecipe={() => {}}
 						editRecipe={editRecipe}
 						isCreate={isCreate}
 						onUpdateRecipe={onUpdateRecipe}

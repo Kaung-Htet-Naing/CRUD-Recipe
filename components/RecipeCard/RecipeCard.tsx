@@ -19,7 +19,7 @@ const RecipeCard = ({
 }: recipeCardType) => {
 	return (
 		<Card
-			className="w-[inherit] px-2 bg-[#FFEEBB]  mb-4 hover:bg-[#DADEE2]"
+			className="w-[inherit] px-2 hover:bg-[#FFEEBB]  mb-4 bg-[#DADEE2]"
 			onClickCapture={() => onSelectCard(id)}
 			sx={{
 				overflow: "visible",

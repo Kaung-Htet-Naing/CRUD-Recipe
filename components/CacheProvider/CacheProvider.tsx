@@ -7,6 +7,10 @@ const cache = createCache({
 	prepend: true,
 });
 
-export default function PlainCssPriority({ children }) {
+export default function PlainCssPriority({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
 	return <CacheProvider value={cache}>{children}</CacheProvider>;
 }

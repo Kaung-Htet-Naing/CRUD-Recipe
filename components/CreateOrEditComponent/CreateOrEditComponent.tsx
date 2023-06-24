@@ -16,10 +16,10 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 
 type CreateOrEditComponentType = {
-	editRecipe?: recipeType;
-	onUpdateRecipe?: (id: number, updatedRecipe: recipeType) => void;
+	editRecipe?: recipeType | null;
+	onUpdateRecipe: (id: any, updatedRecipe: recipeType) => void;
 	isCreate?: boolean;
-	onCreateRecipe?: (updatedRecipe: Omit<recipeType, "id">) => void;
+	onCreateRecipe: (updatedRecipe: any) => void;
 };
 
 type errorType = {
@@ -36,11 +36,11 @@ const CreateOrEditComponent = ({
 	onCreateRecipe,
 }: CreateOrEditComponentType) => {
 	const [cat, setCat] = React.useState<string>("");
-	const [recipeId, setRecipeID] = React.useState<number | null>(null);
+	const [recipeId, setRecipeID] = React.useState<number>(0);
 	const [title, setTitle] = React.useState<string>("");
 	const [ings, setIngs] = React.useState<string[]>([]);
 	const [descr, setDescr] = React.useState<string>("");
-	const newRecipeRef = useRef<HTMLInputElement | null>(null);
+	const newRecipeRef = useRef<any>(null);
 	const [error, setError] = React.useState<errorType>({
 		titleError: false,
 		categoryError: false,
@@ -188,7 +188,7 @@ const CreateOrEditComponent = ({
 						placeholder="Add New Recipe"
 						InputProps={{ disableUnderline: true }}
 						sx={{ input: { color: "white" }, maxWidth: 150 }}
-						onKeyDown={(event) => {
+						onKeyDown={(event:any) => {
 							if (event.key === "Enter") {
 								event.defaultMuiPrevented = true;
 								handleAdd(event.target.value as string);
