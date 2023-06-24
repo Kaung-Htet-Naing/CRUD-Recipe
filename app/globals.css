@@ -11,9 +11,6 @@
 	--background-end-rgb: 255, 255, 255;
 }
 
-.min-w-inherit {
-	max-width: inherit;
-}
 /*  */
 /* @media (prefers-color-scheme: dark) { */
 /* :root { */

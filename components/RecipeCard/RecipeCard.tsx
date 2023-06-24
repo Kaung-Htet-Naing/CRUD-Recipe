@@ -3,14 +3,14 @@ import { Edit, Delete } from "@mui/icons-material";
 import { Stack, Typography, Chip, Card, IconButton } from "@mui/material";
 import React from "react";
 
-type recipeCardType = recipeType & {
+type recipeCardType = Omit<recipeType, "category" | "description"> & {
 	onSelectCard: (id: number) => void;
 	onDeleteRecipe: (id: number) => void;
 	onEditRecipe: (id: number) => void;
 };
 
 const RecipeCard = ({
-	label,
+	title,
 	ingredients,
 	onSelectCard,
 	onDeleteRecipe,
@@ -19,13 +19,15 @@ const RecipeCard = ({
 }: recipeCardType) => {
 	return (
 		<Card
-			className="w-[inherit] px-2 bg-[#FCFDFD] overflow-none mb-4"
+			className="w-[inherit] px-2 bg-[#FFEEBB]  mb-4 hover:bg-[#DADEE2]"
 			onClickCapture={() => onSelectCard(id)}
-			sx={{ overflow: "visible" }}
+			sx={{
+				overflow: "visible",
+			}}
 		>
 			<div className="flex flex-row justify-between py-4">
 				<Typography sx={{ fontSize: 20 }} color="text.primary" gutterBottom>
-					{label}
+					{title}
 				</Typography>
 				<Stack direction="row" spacing={1}>
 					<IconButton aria-label="edit" onClickCapture={() => onEditRecipe(id)}>

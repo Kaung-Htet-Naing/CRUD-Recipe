@@ -26,6 +26,7 @@ type errorType = {
 	titleError: boolean;
 	categoryError: boolean;
 	ingredientError: boolean;
+	descriptionError: boolean;
 };
 
 const CreateOrEditComponent = ({
@@ -44,6 +45,7 @@ const CreateOrEditComponent = ({
 		titleError: false,
 		categoryError: false,
 		ingredientError: false,
+		descriptionError: false,
 	});
 
 	const formValidation = () => {
@@ -52,15 +54,16 @@ const CreateOrEditComponent = ({
 			titleError: title.length === 0,
 			categoryError: cat.length === 0,
 			ingredientError: ings.length < 4,
+			descriptionError: descr.length === 0,
 		}));
 	};
 
 	useEffect(() => {
 		if (!isCreate && editRecipe) {
-			const { label, category, description, ingredients, id } = editRecipe;
+			const { title, category, description, ingredients, id } = editRecipe;
 			setRecipeID(id);
 			setCat(category);
-			setTitle(label);
+			setTitle(title);
 			setIngs(ingredients);
 			setDescr(description);
 		}
@@ -80,10 +83,10 @@ const CreateOrEditComponent = ({
 
 	const handleCreateOrUpdateRecipe = () => {
 		formValidation();
-		if ((title.length !== 0 || cat.length !== 0, ings.length >= 4)) {
+		if (title.length !== 0 && cat.length !== 0 && ings.length >= 4) {
 			if (isCreate) {
 				onCreateRecipe({
-					label: title,
+					title: title,
 					category: cat,
 					ingredients: ings,
 					description: descr,
@@ -96,22 +99,13 @@ const CreateOrEditComponent = ({
 			} else {
 				onUpdateRecipe(recipeId, {
 					id: recipeId,
-					label: title,
+					title: title,
 					category: cat,
 					ingredients: ings,
 					description: descr,
 				});
 			}
 		}
-		/* 	if (!isCreate) {
-			onUpdateRecipe(recipeId, {
-				id: recipeId,
-				label: title,
-				category: cat,
-				ingredients: ings,
-				description: descr,
-			});
-		} */
 	};
 
 	return (
@@ -148,8 +142,10 @@ const CreateOrEditComponent = ({
 			</FormControl>
 			<div className="w-full my-4">
 				<TextField
+					required
 					id="outlined-multiline-static"
 					label="Description"
+					error={error.descriptionError}
 					multiline
 					value={descr}
 					onChange={(event) => setDescr(event.target.value as string)}

@@ -10,65 +10,10 @@ import {
 	RecipeCard,
 } from "@/components";
 
-const recipeMenus = [
-	{
-		id: 1,
-		label: "Chicken Curry",
-		category: "lunch",
-		ingredients: ["salt", "sugar", "papper", "chicken"],
-		description: "I love this chicken curry so much",
-	},
-	{
-		id: 2,
-		label: "Rubber Band",
-		category: "breakfast",
-		ingredients: [
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-			"salt",
-			"sugar",
-			"papper",
-			"chicken",
-		],
-		description: "I love this chicken curry so much",
-	},
-	{
-		id: 3,
-		label: "Pizza",
-		category: "dinner",
-		ingredients: ["salt", "sugar", "papper", "chicken"],
-		description: "I love this chicken curry so much",
-	},
-	{
-		id: 4,
-		label: "chuper Curry",
-		category: "lunch",
-		ingredients: ["salt", "sugar", "papper", "chicken"],
-		description: "I love this chicken curry so much",
-	},
-];
-
+const API_URL = "https://recipe-apo.onrender.com/api/v1/";
 export type recipeType = {
 	id: number;
-	label: string;
+	title: string;
 	category: string;
 	ingredients: string[];
 	description: string;
@@ -77,12 +22,26 @@ export type recipeType = {
 type recipesType = recipeType[];
 
 export default function Home() {
-	const [recipes, setRecipes] = useState<recipesType>(recipeMenus);
+	const [recipes, setRecipes] = useState<recipesType>([]);
 	const [filterRecipes, setFilterRecipes] = useState<recipesType>([]);
-	const [selectedRecipe, setSelectedRecipe] = useState<recipeType>(recipes[0]);
+	const [selectedRecipe, setSelectedRecipe] = useState<recipeType | null>(null);
 	const [editRecipe, setEditRecipe] = useState<recipeType | null>(null);
 	const [isCreate, setIsCreate] = useState<boolean>(false);
 	const [isDetail, setDetail] = useState(true);
+
+	const getRecipes = () => {
+		fetch(`${API_URL}/recipes`, { method: "GET" })
+			.then((res) => res.json())
+			.then((r) => {
+				setRecipes(r);
+				setSelectedRecipe(r[0]);
+			})
+			.catch((error) => console.log(error));
+	};
+
+	useEffect(() => {
+		getRecipes();
+	}, []);
 
 	const onFilterRecipe = (value: string) => {
 		console.log(value.length);
@@ -90,23 +49,18 @@ export default function Home() {
 			setFilterRecipes(recipes);
 			return;
 		}
-		/* const filter = recipes.filter((recipe) =>
-			recipe.label
-				.toLowerCase()
-				.replace(/\s/g, "")
-				.includes(value.toLowerCase().replace(/\s/g, ""))
-		);
-		setFilterRecipes(filter); */
 	};
 
 	const onSelectCard = (id: number) => {
 		const filter = recipes.filter((recipe) => recipe.id === id);
+
 		setSelectedRecipe(filter[0]);
 		setDetail(true);
 	};
 
 	const onDeleteRecipe = (id: number) => {
 		const updatedRecipes = recipes.filter((recipe) => recipe.id !== id);
+		fetch(`${API_URL}/recipes/${id}`, { method: "DELETE" });
 		setRecipes(updatedRecipes);
 		setSelectedRecipe(updatedRecipes[0]);
 	};
@@ -119,6 +73,13 @@ export default function Home() {
 	};
 
 	const onUpdateRecipe = (id: number, updatedRecipe: recipeType) => {
+		fetch(`${API_URL}/recipes/${id}`, {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(updatedRecipe),
+		});
 		setRecipes((prevRecipes) =>
 			prevRecipes.map((recipe) =>
 				recipe.id === id ? { ...updatedRecipe } : recipe
@@ -127,6 +88,15 @@ export default function Home() {
 	};
 
 	const onCreateRecipe = (newRecipe: Omit<recipeType, "id">) => {
+		fetch(`${API_URL}/recipes/`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(newRecipe),
+		})
+			.then((r) => console.log(r))
+			.catch((e) => console.log(e));
 		const maxId = recipes.reduce(
 			(max, recipe) => (recipe.id > max ? recipe.id : max),
 			0
@@ -156,9 +126,9 @@ export default function Home() {
 				<Autocomplete
 					selectOnFocus
 					clearOnBlur
-					options={recipeMenus}
+					options={recipes}
 					disablePortal
-					getOptionLabel={(option) => option.label}
+					getOptionLabel={(option) => option.title}
 					renderOption={(props, option) => (
 						<li
 							{...props}
@@ -166,7 +136,7 @@ export default function Home() {
 								setFilterRecipes(option);
 							}}
 						>
-							{option.label}
+							{option.title}
 						</li>
 					)}
 					renderInput={(params) => <TextField {...params} label="Search" />}
@@ -176,7 +146,7 @@ export default function Home() {
 							console.log(event.target.value);
 							setFilterRecipes(
 								recipes.filter((recipe) =>
-									recipe.label
+									recipe.title
 										.toLowerCase()
 										.replace(/\s/g, "")
 										.includes(
@@ -191,10 +161,10 @@ export default function Home() {
 				/>
 				<div className="flex flex-col overflow-y-scroll">
 					{filterRecipes?.length > 0
-						? filterRecipes.map(({ label, ingredients, id }, index) => (
+						? filterRecipes.map(({ title, ingredients, id }) => (
 								<RecipeCard
-									key={index}
-									label={label}
+									key={id}
+									title={title}
 									ingredients={ingredients}
 									onSelectCard={onSelectCard}
 									onDeleteRecipe={onDeleteRecipe}
@@ -202,10 +172,10 @@ export default function Home() {
 									id={id}
 								/>
 						  ))
-						: recipes.map(({ label, ingredients, id }, index) => (
+						: recipes.map(({ title, ingredients, id }) => (
 								<RecipeCard
-									key={index}
-									label={label}
+									key={id}
+									title={title}
 									ingredients={ingredients}
 									onSelectCard={onSelectCard}
 									onDeleteRecipe={onDeleteRecipe}
